@@ -2,8 +2,6 @@ local player = game:GetService("Players").LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 
-playerGui.ResetOnSpawn = false
-
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "PesunBuilder"
 screenGui.Parent = playerGui
