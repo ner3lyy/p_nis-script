@@ -23,7 +23,7 @@ header.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 header.TextStrokeTransparency = 0
 header.Parent = mainFrame
 
--- Перемещение на ПК и телефоне
+
 local dragging = false
 local dragStart, startPos
 
@@ -53,7 +53,7 @@ header.InputEnded:Connect(function(input)
     end
 end)
 
--- Кнопка создания минигана
+
 local createButton = Instance.new("TextButton")
 createButton.Size = UDim2.new(0, 200, 0, 50)
 createButton.Position = UDim2.new(0.5, -100, 0.5, -25)
@@ -71,7 +71,7 @@ local weldBarrel
 local isShooting = false
 local shootSound
 
--- Очередь подсказок
+
 local hintQueue = {}
 local isHintActive = false
 
@@ -104,7 +104,7 @@ local function showHint(message, duration)
     end
 end
 
--- Создание минигана
+
 local function createMiniGun()
     local character = player.Character or player.CharacterAdded:Wait()
     local lowerTorso = character:FindFirstChild("LowerTorso")
@@ -164,7 +164,7 @@ local function createMiniGun()
         end)
     end
 
-    -- Управление стрельбой на ПК и телефоне
+    
     local UIS = game:GetService("UserInputService")
     UIS.InputBegan:Connect(function(input, gameProcessed)
         if not gameProcessed and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
