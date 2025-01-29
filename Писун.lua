@@ -196,3 +196,5 @@ createButton.MouseButton1Click:Connect(function()
     createButton.Text = "Создать песун"
     createButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 end)
+
+showHint("Успешно загружено! Разрабы: @ner3lyy", 5)
