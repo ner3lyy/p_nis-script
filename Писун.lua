@@ -1,7 +1,6 @@
 local player = game:GetService("Players").LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
-
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "PesunBuilder"
 screenGui.Parent = playerGui
@@ -24,20 +23,6 @@ header.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 header.TextStrokeTransparency = 0
 header.Parent = mainFrame
 
-
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 25, 0, 25)
-closeButton.Position = UDim2.new(1, -30, 0, 5)
-closeButton.Text = "X"
-closeButton.Font = Enum.Font.SourceSansBold
-closeButton.TextSize = 18
-closeButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.Parent = mainFrame
-
-closeButton.MouseButton1Click:Connect(function()
-    screenGui.Enabled = false
-end)
 
 local dragging = false
 local dragStart, startPos
@@ -68,6 +53,7 @@ header.InputEnded:Connect(function(input)
     end
 end)
 
+
 local createButton = Instance.new("TextButton")
 createButton.Size = UDim2.new(0, 200, 0, 50)
 createButton.Position = UDim2.new(0.5, -100, 0.5, -25)
@@ -80,23 +66,44 @@ createButton.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 createButton.TextStrokeTransparency = 0
 createButton.Parent = mainFrame
 
-local function showHint(message, duration)
-    local hint = Instance.new("TextLabel")
-    hint.Size = UDim2.new(0, 300, 0, 50)
-    hint.Position = UDim2.new(0.5, -150, 0.9, -25)
-    hint.BackgroundTransparency = 0.5
-    hint.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    hint.Text = message
-    hint.Font = Enum.Font.SourceSansBold
-    hint.TextSize = 20
-    hint.TextColor3 = Color3.fromRGB(255, 255, 255)
-    hint.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-    hint.TextStrokeTransparency = 0
-    hint.Parent = screenGui
+local barrel
+local weldBarrel
+local isShooting = false
+local shootSound
 
-    task.wait(duration or 3)
-    hint:Destroy()
+
+local hintQueue = {}
+local isHintActive = false
+
+local function showHint(message, duration)
+    table.insert(hintQueue, {message = message, duration = duration or 3})
+
+    if not isHintActive then
+        isHintActive = true
+        task.spawn(function()
+            while #hintQueue > 0 do
+                local hintData = table.remove(hintQueue, 1)
+                local hint = Instance.new("TextLabel")
+                hint.Size = UDim2.new(0, 300, 0, 50)
+                hint.Position = UDim2.new(0.5, -150, 0.9, -25)
+                hint.BackgroundTransparency = 0.5
+                hint.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+                hint.Text = hintData.message
+                hint.Font = Enum.Font.SourceSansBold
+                hint.TextSize = 20
+                hint.TextColor3 = Color3.fromRGB(255, 255, 255)
+                hint.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                hint.TextStrokeTransparency = 0
+                hint.Parent = screenGui
+
+                wait(hintData.duration)
+                hint:Destroy()
+            end
+            isHintActive = false
+        end)
+    end
 end
+
 
 local function createMiniGun()
     local character = player.Character or player.CharacterAdded:Wait()
@@ -120,14 +127,14 @@ local function createMiniGun()
         return part
     end
 
-    local barrel = createPart(Vector3.new(1.2, 1.2, 4), torsoColor, character)
-    local weldBarrel = Instance.new("Weld")
+    barrel = createPart(Vector3.new(1.2, 1.2, 4), torsoColor, character)
+    weldBarrel = Instance.new("Weld")
     weldBarrel.Part0 = lowerTorso
     weldBarrel.Part1 = barrel
     weldBarrel.C0 = CFrame.new(0, -0.5, -2)
     weldBarrel.Parent = barrel
 
-    local shootSound = Instance.new("Sound")
+    shootSound = Instance.new("Sound")
     shootSound.SoundId = "rbxassetid://6723675399"
     shootSound.Volume = 1
     shootSound.Looped = true
@@ -145,6 +152,7 @@ local function createMiniGun()
         bullet.CFrame = CFrame.new(barrel.Position, targetPosition)
         bullet.CanCollide = true
         bullet.Massless = false
+
         bullet.AssemblyLinearVelocity = direction
 
         game:GetService("Debris"):AddItem(bullet, 10)
@@ -156,16 +164,16 @@ local function createMiniGun()
         end)
     end
 
+    
     local UIS = game:GetService("UserInputService")
-    local isShooting = false
-
     UIS.InputBegan:Connect(function(input, gameProcessed)
         if not gameProcessed and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
             isShooting = true
             shootSound:Play()
+
             while isShooting do
                 shoot()
-                task.wait(0.1)
+                wait(0.1)
             end
         end
     end)
@@ -177,14 +185,14 @@ local function createMiniGun()
         end
     end)
 
-    showHint("Песун создан! Зажми ЛКМ или коснись экрана, чтобы писять", 5)
+    showHint("Песун создан! Зажми ЛКМ или коснись экрана, чтобы писять", 5) 
 end
 
 createButton.MouseButton1Click:Connect(function()
     createMiniGun()
     createButton.Text = "Песун создан!"
     createButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-    task.wait(2)
+    wait(2)
     createButton.Text = "Создать песун"
     createButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 end)
